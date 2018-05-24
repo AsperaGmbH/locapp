@@ -100,7 +100,7 @@ public class MergeCommand implements CommandRunnable {
      */
     private String createUniqueKey(Localization loc) {
         StringBuilder builder = new StringBuilder();
-        builder.append(loc.getFileName()).append("@");
+        builder.append(loc.getFullPath()).append("@");
         builder.append(loc.getKey()).append("@");
         builder.append(loc.getStatus().name()).append("@");
         builder.append(loc.getLocale()).append("@VERSION=");
