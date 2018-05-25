@@ -2,6 +2,7 @@ package de.aspera.locapp.cmd;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,9 +31,9 @@ import de.aspera.locapp.util.HelperUtil;
  */
 public class ExportPropertiesCommand implements CommandRunnable {
 
-    private static final Logger logger = Logger.getLogger(ExportPropertiesCommand.class.getName());
-    private LocalizationFacade locFacade = new LocalizationFacade();
-    private List<Localization> allLocalizations;
+    private static final Logger logger    = Logger.getLogger(ExportPropertiesCommand.class.getName());
+    private LocalizationFacade  locFacade = new LocalizationFacade();
+    private List<Localization>  allLocalizations;
 
     @Override
     public void run() {
@@ -58,10 +59,8 @@ public class ExportPropertiesCommand implements CommandRunnable {
                     String replacedFile = replaceFilePathWithLocale(myfile, local);
 
                     File exportPropertyFile = new File(exportPath + replacedFile);
-                    OutputStream outStream = FileUtils.openOutputStream(exportPropertyFile);
                     Properties prop = new Properties() {
                         private static final long serialVersionUID = 7103264221960600113L;
-
                         // this sort the keys of a property file.
                         @Override
                         public synchronized Enumeration<Object> keys() {
@@ -69,13 +68,27 @@ public class ExportPropertiesCommand implements CommandRunnable {
                         }
                     };
 
+                    if (exportPropertyFile.exists()) {
+                        InputStream input = FileUtils.openInputStream(exportPropertyFile);
+                        if (input != null) {
+                            prop.load(input);
+                        }
+                    }
+
                     String locFilename = null;
                     for (Localization loc : getLocalization(replacedFile)) {
                         logger.fine("save -> file: " + replacedFile + " >> key: " + loc.getKey() + " ; value: "
                                 + loc.getValue());
-                        prop.put(loc.getKey(), loc.getValue());
+                        if (prop.containsKey(loc.getKey())) {
+                            if (!prop.get(loc.getKey()).equals(loc.getValue())) {
+                                prop.setProperty(loc.getKey(), loc.getValue());
+                            }
+                        } else {
+                            prop.put(loc.getKey(), loc.getValue());
+                        }
                         locFilename = loc.getFileName();
                     }
+                    OutputStream outStream = FileUtils.openOutputStream(exportPropertyFile);
                     if (prop.size() >= 1) {
                         prop.store(outStream, "SLC property file " + locFilename != null ? locFilename : "");
                     } else {
