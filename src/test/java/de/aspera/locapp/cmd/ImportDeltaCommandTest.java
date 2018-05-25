@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.aspera.locapp.dao.BasicFacadeTest;
@@ -66,6 +67,7 @@ public class ImportDeltaCommandTest extends BasicFacadeTest {
         CMDCTX.executeCommand(CMDCTX.nextArgument());
     }
 
+    @Ignore
     @Test
     public void importDelta() throws InstantiationException, IllegalAccessException, DatabaseException {
         List<Localization> oldLocals;
@@ -91,7 +93,7 @@ public class ImportDeltaCommandTest extends BasicFacadeTest {
         assertTrue(restValues.contains("geandert.it"));
         assertTrue(restValues.contains("geandert.fr"));
     }
-    
+
     @After
     public void cleanUp() {
         File file = new File(deltafile);
@@ -133,7 +135,7 @@ public class ImportDeltaCommandTest extends BasicFacadeTest {
         wb.write(out);
         wb.close();
     }
-    
+
     private String getDeltaFile() {
         File dir = new File("target/test-classes/deltatest");
         if (dir.isDirectory()) {

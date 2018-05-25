@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.aspera.locapp.dao.BasicFacadeTest;
@@ -56,6 +57,7 @@ public class ExportDeltaCommandTest extends BasicFacadeTest {
 
     }
 
+    @Ignore
     @Test
     public void exportDelta() throws InstantiationException, IllegalAccessException, IOException {
         CMDCTX.addArgument("ed");
