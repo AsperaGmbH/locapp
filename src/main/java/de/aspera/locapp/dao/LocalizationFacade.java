@@ -5,9 +5,10 @@
  */
 package de.aspera.locapp.dao;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -160,7 +161,7 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
     }
 
-    public List<String> getDefaultFilesEN() throws DatabaseException {
+    public Set<String> getDefaultFilesEN() throws DatabaseException {
         try {
             getEntityManager().getTransaction().begin();
             String query = "select distinct target.fullPath from " + Localization.class.getSimpleName()
@@ -168,14 +169,18 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
             @SuppressWarnings("unchecked")
             List<String> fullPaths = (List<String>) getEntityManager().createQuery(query).getResultList();
             getEntityManager().getTransaction().commit();
-
-            List<String> pathsEN = new ArrayList<>();
+            
+            List<String> languages = getLanguages();
+            Set<String> paths = new HashSet<>();
+            
             for (String path : fullPaths) {
                 if (HelperUtil.getLocaleFromPropertyFile(path).equals(Locale.ENGLISH.toString())) {
-                    pathsEN.add(path);
+                    paths.add(path);
+                } else {
+                	paths.add(HelperUtil.removeLanguageFromPath(path));
                 }
             }
-            return pathsEN;
+            return paths;
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }

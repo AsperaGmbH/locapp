@@ -10,6 +10,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +52,7 @@ public class ExportPropertiesCommand implements CommandRunnable {
 
         try {
             allLocalizations = locFacade.getLocalizations(locFacade.lastVersion(Status.XLS), Status.XLS, false, null);
-            List<String> filesFullPathEN = locFacade.getDefaultFilesEN();
+            Set<String> filesFullPathEN = locFacade.getDefaultFilesEN();
             List<String> languages = locFacade.getLanguages();
 
             for (String myfile : filesFullPathEN) {

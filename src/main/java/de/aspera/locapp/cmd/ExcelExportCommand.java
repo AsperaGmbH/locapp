@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,7 +122,7 @@ public class ExcelExportCommand implements CommandRunnable {
             fileName = HelperUtil.currentTimestamp() + "-export-all.xls";
         }
 
-        List<String> fullPaths = locFacade.getDefaultFilesEN();
+        Set<String> fullPaths = locFacade.getDefaultFilesEN();
         exportPath += SystemUtils.IS_OS_WINDOWS ? "\\" : "/";
         int rowcount = ROWGAP_HEADER;
 
