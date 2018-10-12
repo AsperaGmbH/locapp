@@ -68,13 +68,19 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
     }
 
-    public List<String> getLanguages() throws DatabaseException {
+    public List<String> getLanguages(boolean exportProperties) throws DatabaseException {
         try {
-            getEntityManager().getTransaction().begin();
-            String query = "select distinct target.locale from " + Localization.class.getSimpleName() + " target";
+            String queryStr = "select distinct target.locale from " + Localization.class.getSimpleName() + " target ";
+            if (exportProperties) {
+            	queryStr += " where target.status = :status AND target.version = :version";
+            }
+            Query query = getEntityManager().createQuery(queryStr);
+            if (exportProperties) {
+            	query.setParameter("version", lastVersion(Status.XLS));
+            	query.setParameter("status", Status.XLS);
+            }
             @SuppressWarnings("unchecked")
-            List<String> languages = (List<String>) getEntityManager().createQuery(query).getResultList();
-            getEntityManager().getTransaction().commit();
+            List<String> languages = (List<String>) query.getResultList();
             return languages;
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);

@@ -90,7 +90,7 @@ public class ExportDeltaCommand implements CommandRunnable {
 
     private List<String> getLanguages() throws DatabaseException {
         if (languages == null || languages.isEmpty()) {
-            languages = locaFacade.getLanguages();
+            languages = locaFacade.getLanguages(false);
         }
         return languages;
     }

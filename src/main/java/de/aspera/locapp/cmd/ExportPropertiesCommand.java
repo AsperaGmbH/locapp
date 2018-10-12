@@ -53,11 +53,11 @@ public class ExportPropertiesCommand implements CommandRunnable {
         try {
             allLocalizations = locFacade.getLocalizations(locFacade.lastVersion(Status.XLS), Status.XLS, false, null);
             Set<String> defaultPathFiles = locFacade.getDefaultFiles(true);
-            List<String> languages = locFacade.getLanguages();
+            List<String> languages = locFacade.getLanguages(true);
 
             for (String defaultPathFile : defaultPathFiles) {
                 for (String local : languages) {
-                	if (skipPropertyFile(defaultPathFile, local)) {
+                	if (skipPropertyFile(defaultPathFile, languages)) {
                 		continue; // skip unnecessary languages and files
                 	}
                     String replacedFile = replaceFilePathWithLocale(defaultPathFile, local);
@@ -111,10 +111,10 @@ public class ExportPropertiesCommand implements CommandRunnable {
         logger.log(Level.INFO, "Export properties fileset into a directory [" + exportPath + "] in ms: " + end);
     }
 
-	private boolean skipPropertyFile(String defaultFilePath, String language) {
+	private boolean skipPropertyFile(String defaultFilePath, List<String> languages) {
 		for (Localization loc : allLocalizations) {
-			if (!loc.getLocale().equals(language)
-					&& HelperUtil.removeLanguageFromPath(loc.getFullPath()).equals(defaultFilePath) ) {
+			if (HelperUtil.removeLanguageFromPath(loc.getFullPath()).equals(defaultFilePath)
+					&& !languages.contains(loc.getLocale())) {
 				return true; // skip unnecessary languages
 			}
 		}

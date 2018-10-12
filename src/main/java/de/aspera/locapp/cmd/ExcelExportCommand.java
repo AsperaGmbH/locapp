@@ -131,7 +131,7 @@ public class ExcelExportCommand implements CommandRunnable {
         Sheet sheet = wb.createSheet("SLC Properties");
         List<Sheet> sheets = new ArrayList<>();
         sheets.add(sheet);
-        List<String> knownLanguages = locFacade.getLanguages();
+        List<String> knownLanguages = locFacade.getLanguages(false);
 
         // create header row
         Row rowheader = sheets.get(0).createRow(rowcount++);

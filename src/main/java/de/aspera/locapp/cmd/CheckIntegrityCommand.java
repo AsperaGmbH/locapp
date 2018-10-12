@@ -34,7 +34,7 @@ public class CheckIntegrityCommand implements CommandRunnable {
         if (options != null && options.length > 0) {
             languages.add(options[0].toLowerCase());
         } else {
-            languages = locFacade.getLanguages();
+            languages = locFacade.getLanguages(false);
         }
 
         boolean successfull = true;
