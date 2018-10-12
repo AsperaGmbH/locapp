@@ -122,7 +122,7 @@ public class ExcelExportCommand implements CommandRunnable {
             fileName = HelperUtil.currentTimestamp() + "-export-all.xls";
         }
 
-        Set<String> fullPaths = locFacade.getDefaultFilesEN();
+        Set<String> fullPaths = locFacade.getDefaultFiles(false);
         exportPath += SystemUtils.IS_OS_WINDOWS ? "\\" : "/";
         int rowcount = ROWGAP_HEADER;
 

@@ -161,18 +161,23 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
     }
 
-    public Set<String> getDefaultFilesEN() throws DatabaseException {
+    public Set<String> getDefaultFiles(boolean exportProperties) throws DatabaseException {
         try {
-            getEntityManager().getTransaction().begin();
-            String query = "select distinct target.fullPath from " + Localization.class.getSimpleName()
-                    + " target where target.fullPath LIKE '%.properties'";
+            String queryStr = "select distinct target.fullPath from " + Localization.class.getSimpleName()
+                    + " target where target.fullPath LIKE :fullPath ";
+            if (exportProperties) {
+            	queryStr += "AND target.status = :status AND target.version = :version";
+            }
+            Query query = getEntityManager().createQuery(queryStr);
+            query.setParameter("fullPath", "%.properties");
+            if (exportProperties) {
+            	query.setParameter("version", lastVersion(Status.XLS));
+            	query.setParameter("status", Status.XLS);
+            }
+            	
             @SuppressWarnings("unchecked")
-            List<String> fullPaths = (List<String>) getEntityManager().createQuery(query).getResultList();
-            getEntityManager().getTransaction().commit();
-            
-            List<String> languages = getLanguages();
+			List<String> fullPaths = (List<String>) query.getResultList();
             Set<String> paths = new HashSet<>();
-            
             for (String path : fullPaths) {
                 if (HelperUtil.getLocaleFromPropertyFile(path).equals(Locale.ENGLISH.toString())) {
                     paths.add(path);
@@ -180,6 +185,7 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
                 	paths.add(HelperUtil.removeLanguageFromPath(path));
                 }
             }
+            
             return paths;
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
