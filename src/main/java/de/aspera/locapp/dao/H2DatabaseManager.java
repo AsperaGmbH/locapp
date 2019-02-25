@@ -20,6 +20,7 @@ import de.aspera.locapp.util.Resources;
  *
  * @author daniel
  */
+
 public class H2DatabaseManager {
 
     private static H2DatabaseManager instance;
@@ -38,7 +39,7 @@ public class H2DatabaseManager {
     }
 
     /**
-     * Voreinstellung für die Datenbank.
+     * Voreinstellung fï¿½r die Datenbank.
      */
     private void init() {
 
@@ -49,7 +50,7 @@ public class H2DatabaseManager {
             dbaction = "create"; // "drop-and-create";
         }
 
-        // AUTO_SERVER=TRUE ermöglicht den Zugriff für mehrere Apps auf die
+        // AUTO_SERVER=TRUE ermï¿½glicht den Zugriff fï¿½r mehrere Apps auf die
         // gleich Datenbank!
         databaseProperties.put("javax.persistence.jdbc.url",
                 "jdbc:h2:~/." + Resources.PROJECT_NAME + "/"

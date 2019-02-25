@@ -10,6 +10,7 @@ public class CommandContext {
     private static Map<String, Class<? extends CommandRunnable>> commandMap = new HashMap<>();
     private static Queue<String> argumentStack = new LinkedList<>();
     private static CommandContext instance;
+    
 
     public static synchronized CommandContext getInstance() {
         if (instance == null) {

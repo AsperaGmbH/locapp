@@ -19,6 +19,7 @@ import org.apache.commons.lang3.SystemUtils;
  * @author daniel
  */
 public class Resources {
+	
 
     private static Resources resources;
     private static Properties systemProperties;
@@ -34,7 +35,7 @@ public class Resources {
     }
 
     /**
-     * Liefert eine statische Instanz für die Ressourcen.
+     * Liefert eine statische Instanz fï¿½r die Ressourcen.
      *
      * @return die Ressourcen.
      */
@@ -47,7 +48,7 @@ public class Resources {
 
     /**
      * Initialisiert die System Properties. Liest die Properties aus der
-     * Konfigurationsdatei. Der Name der Konfigurationsdatei ist abhängig von
+     * Konfigurationsdatei. Der Name der Konfigurationsdatei ist abhï¿½ngig von
      * der Anwendungsumgebung.
      */
     private static void initializeResources() {
