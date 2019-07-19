@@ -10,5 +10,5 @@ package de.aspera.locapp.cmd;
 public interface CommandRunnable {
     public static final String EMPTY_VALUE = "";
 
-    void run();
+    void run() throws CommandException;
 }

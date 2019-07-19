@@ -18,6 +18,7 @@ import javax.imageio.ImageIO;
 import org.h2.tools.Server;
 
 import de.aspera.locapp.cmd.CommandContext;
+import de.aspera.locapp.cmd.CommandException;
 import de.aspera.locapp.dao.H2DatabaseManager;
 import de.aspera.locapp.util.Resources;
 
@@ -76,7 +77,7 @@ public class MainStart {
         if (CommandContext.getInstance().isCommand(cmd)) {
             try {
                 CommandContext.getInstance().executeCommand(cmd);
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | IllegalAccessException | CommandException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {

@@ -31,64 +31,70 @@ import de.aspera.locapp.util.HelperUtil;
  */
 public class ImportPropertiesCommand implements CommandRunnable {
 
-    private static final Logger logger = Logger.getLogger(ImportPropertiesCommand.class.getName());
+	private static final Logger logger = Logger.getLogger(ImportPropertiesCommand.class.getName());
 
-    @Override
-    public void run() {
-        importPropertiesFiles();
-    }
+	@Override
+	public void run() throws CommandException {
+		importPropertiesFiles();
+	}
 
-    private void importPropertiesFiles() {
-        long start = System.currentTimeMillis();
+	private void importPropertiesFiles() throws CommandException {
+		long start = System.currentTimeMillis();
+		InputStream inStream = null;
 
-        try {
-            FileInfoFacade fileFacade = new FileInfoFacade();
-            List<FileInfo> files = fileFacade.findAll();
+		try {
+			FileInfoFacade fileFacade = new FileInfoFacade();
+			List<FileInfo> files = fileFacade.findAll();
 
-            if (files == null || files.size() == 0) {
-                logger.info("Nothing to do here! Please use 'files [DIR]' to find the properties files.");
-                return;
-            }
+			if (files == null || files.size() == 0) {
+				logger.info("Nothing to do here! Please use 'files [DIR]' to find the properties files.");
+				return;
+			}
 
-            LocalizationFacade locFacade = new LocalizationFacade();
-            int lastVersion = locFacade.lastVersion(Status.SRC) + 1; // increase
-                                                                     // the
-                                                                     // version
-                                                                     // of a loc
-                                                                     // data row
-            for (FileInfo myfile : files) {
+			LocalizationFacade locFacade = new LocalizationFacade();
+			// increase the version of a loc data row
+			int lastVersion = locFacade.lastVersion(Status.SRC) + 1;
+			for (FileInfo myfile : files) {
 
-                List<Localization> locs = new ArrayList<>();
-                String locale = HelperUtil.getLocaleFromPropertyFile(myfile.getFileName());
-                InputStream inStream = FileUtils.openInputStream(new File(myfile.getFullPath()));
-                Properties prop = new Properties();
-                prop.load(inStream);
-                Enumeration<?> enums = prop.propertyNames();
+				List<Localization> locs = new ArrayList<>();
+				String locale = HelperUtil.getLocaleFromPropertyFile(myfile.getFileName());
+				inStream = FileUtils.openInputStream(new File(myfile.getFullPath()));
+				Properties prop = new Properties();
+				prop.load(inStream);
+				Enumeration<?> enums = prop.propertyNames();
 
-                while (enums.hasMoreElements()) {
-                    Localization loc = new Localization();
-                    loc.setCreationDate(new Date());
-                    loc.setFileName(myfile.getFileName());
-                    loc.setFullPath(myfile.getRelativePath());
-                    String key = (String) enums.nextElement();
-                    String value = prop.getProperty(key);
-                    loc.setKey(key);
-                    loc.setValue(value);
-                    loc.setVersion(lastVersion);
-                    loc.setLocale(locale);
-                    loc.setStatus(Localization.Status.SRC);
-                    locs.add(loc);
-                }
+				while (enums.hasMoreElements()) {
+					Localization loc = new Localization();
+					loc.setCreationDate(new Date());
+					loc.setFileName(myfile.getFileName());
+					loc.setFullPath(myfile.getRelativePath());
+					String key = (String) enums.nextElement();
+					String value = prop.getProperty(key);
+					loc.setKey(key);
+					loc.setValue(value);
+					loc.setVersion(lastVersion);
+					loc.setLocale(locale);
+					loc.setStatus(Localization.Status.SRC);
+					locs.add(loc);
+				}
 
-                inStream.close();
-                locFacade.saveLocalizations(locs);
-            }
-        } catch (IOException | DatabaseException e) {
-            logger.log(Level.SEVERE, e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
-        }
+				inStream.close();
+				locFacade.saveLocalizations(locs);
+			}
+		} catch (IOException | DatabaseException e) {
+			logger.log(Level.SEVERE, e.getMessage(), e);
+			throw new RuntimeException(e.getMessage(), e);
+		} finally {
 
-        long end = System.currentTimeMillis() - start;
-        logger.log(Level.INFO, "Iterate properties fileset and save into database in ms: " + end);
-    }
+			try {
+				if (inStream != null)
+					inStream.close();
+			} catch (IOException e) {
+				throw new CommandException(e.getMessage(), e);
+			}
+		}
+
+		long end = System.currentTimeMillis() - start;
+		logger.log(Level.INFO, "Iterate properties fileset and save into database in ms: " + end);
+	}
 }

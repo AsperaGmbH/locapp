@@ -32,7 +32,7 @@ public class ExportDeltaCommandTest extends BasicFacadeTest {
     Sheet sheet;
 
     @Before
-    public void init() throws InstantiationException, IllegalAccessException, IOException, DatabaseException {
+    public void init() throws InstantiationException, IllegalAccessException, IOException, DatabaseException, CommandException {
         String testfiles = ExcelExportCommandTest.class.getClassLoader().getResource("deltatest").getFile();
         String xlsfile = ExcelImportCommandTest.class.getClassLoader().getResource("slc_excel_to_import.xls").getFile();
 
@@ -59,7 +59,7 @@ public class ExportDeltaCommandTest extends BasicFacadeTest {
 
     @Ignore
     @Test
-    public void exportDelta() throws InstantiationException, IllegalAccessException, IOException {
+    public void exportDelta() throws InstantiationException, IllegalAccessException, IOException, CommandException {
         CMDCTX.addArgument("ed");
         CMDCTX.addArgument(TEMP_DIR);
         CMDCTX.executeCommand(CMDCTX.nextArgument());

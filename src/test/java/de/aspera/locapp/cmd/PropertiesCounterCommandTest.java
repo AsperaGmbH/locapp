@@ -15,7 +15,7 @@ import de.aspera.locapp.dto.Localization.Status;
 public class PropertiesCounterCommandTest extends BasicFacadeTest {
 
     @Before
-    public void init() throws InstantiationException, IllegalAccessException {
+    public void init() throws InstantiationException, IllegalAccessException, CommandException {
 
         String testfiles = PropertiesCounterCommandTest.class.getClassLoader().getResource("testfiles").getFile();
 
@@ -35,7 +35,7 @@ public class PropertiesCounterCommandTest extends BasicFacadeTest {
 
     @Test
     public void countSRCPropertiesFiles()
-            throws InstantiationException, IllegalAccessException, IOException, DatabaseException {
+            throws InstantiationException, IllegalAccessException, IOException, DatabaseException, CommandException {
         CMDCTX.addArgument("pc");
         CMDCTX.addArgument("src");
         CMDCTX.executeCommand(CMDCTX.nextArgument());
