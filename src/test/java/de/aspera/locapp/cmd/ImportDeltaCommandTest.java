@@ -31,7 +31,7 @@ public class ImportDeltaCommandTest extends BasicFacadeTest {
     String deltafile;
 
     @Before
-    public void init() throws InstantiationException, IllegalAccessException, DatabaseException, IOException {
+    public void init() throws InstantiationException, IllegalAccessException, DatabaseException, IOException, CommandException {
 
         String testfiles = ExcelExportCommandTest.class.getClassLoader().getResource("deltatest").getFile();
         String xlsfile = ExcelImportCommandTest.class.getClassLoader().getResource("slc_excel_to_import.xls").getFile();

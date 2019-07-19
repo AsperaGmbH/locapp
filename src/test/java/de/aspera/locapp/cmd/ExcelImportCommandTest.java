@@ -13,7 +13,7 @@ import de.aspera.locapp.dto.Localization.Status;
 public class ExcelImportCommandTest extends BasicFacadeTest {
     @Test
     public void importExcelFile()
-            throws InstantiationException, IllegalAccessException, IOException, DatabaseException {
+            throws InstantiationException, IllegalAccessException, IOException, DatabaseException, CommandException {
         CMDCTX.addArgument("cl");
         CMDCTX.executeCommand(CMDCTX.nextArgument());
         CMDCTX.addArgument("ei");
