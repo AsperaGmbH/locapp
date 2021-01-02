@@ -92,5 +92,7 @@ public class CommandContext {
         addCommand("merge-properties", MergeCommand.class);
         addCommand("ci", CheckIntegrityCommand.class);
         addCommand("check-integrity", CheckIntegrityCommand.class);
+        addCommand("iil", ImportIgnoredItemsCommand.class);
+        addCommand("import-ignored-list", ImportIgnoredItemsCommand.class);
     }
 }

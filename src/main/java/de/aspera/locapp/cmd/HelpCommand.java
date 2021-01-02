@@ -17,6 +17,7 @@ public class HelpCommand implements CommandRunnable {
         System.out.println("\t(ci)check-integrity [L]: \t\tCheck if all SRC properties provided by XLS properties with all or specified languages(all or by language ISOCODE[L]).");
         System.out.println("\t(cl)ear-loc: \t\t\t\tDelete all(!) entries for Localization!");
         System.out.println("\t(f)iles DIR: \t\t\t\tRead recursive down for properties files and save fileinfo.");
+        System.out.println("\t(iil)import-ignored-list: \t\tImport list of files that are to be excluded from the translation process.");
         System.out.println("\tcommand options mandatory: \t\tCommand parameters without brackets are mandatory");
         System.out.println("\tcommand options optional: \t\tCommand parameters inside brackets are optional\n");
         System.out.println("\t(h)elp: \t\t\t\tPrint this!\n\n");
