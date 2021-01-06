@@ -12,6 +12,7 @@ import org.apache.commons.lang3.SystemUtils;
 import de.aspera.locapp.dao.ConfigFacade;
 import de.aspera.locapp.dao.DatabaseException;
 import de.aspera.locapp.dao.FileInfoFacade;
+import de.aspera.locapp.dao.IgnoredItemFacade;
 import de.aspera.locapp.dto.FileInfo;
 
 public class FilesCommand implements CommandRunnable {
@@ -31,6 +32,8 @@ public class FilesCommand implements CommandRunnable {
 
         long start = System.currentTimeMillis();
         ConfigFacade configFacade = new ConfigFacade();
+        IgnoredItemFacade ignoredItemFacade = new IgnoredItemFacade();
+
         String[] excludedPaths = new String[] { "" };
         try {
             excludedPaths = configFacade.getValue("Excluded_Paths");
@@ -52,6 +55,12 @@ public class FilesCommand implements CommandRunnable {
                 fileInfo.setRelativePath(
                         file.getAbsolutePath().replace(path, SystemUtils.IS_OS_WINDOWS ? ".\\" : "./"));
                 fileInfo.setSearchPath(path);
+
+                if (ignoredItemFacade.isIgnored(file.getName())) {
+                    logger.log(Level.INFO, "Ignoring " + file.getName());
+                    continue;
+                }
+                
                 files.add(fileInfo);
             }
             fileFacade.saveFileInfos(files);
