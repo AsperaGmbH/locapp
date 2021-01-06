@@ -32,11 +32,13 @@ public class ImportIgnoredItemsCommand implements CommandRunnable {
         try {
             for (var ignoredItem : ignoredItems) {
                 ignoredItemFacade.create(ignoredItem);
-
             }
         } catch (DatabaseException e) {
             logger.log(Level.SEVERE, "Error while saving IgnoredItem entity.", e);
+            return;
         }
+
+        logger.log(Level.INFO, "Marked " + ignoredItems.size() + " files to be ignored.");
     }
 
     private List<IgnoredItem> readIgnoredItemsFile(String filePath) {
@@ -70,6 +72,7 @@ public class ImportIgnoredItemsCommand implements CommandRunnable {
             var token = tokenizer.nextToken();
             var item = new IgnoredItem();
             item.setFileName(token);
+            ignoredItems.add(item);
         }
 
         return ignoredItems;
