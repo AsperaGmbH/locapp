@@ -3,6 +3,7 @@ package de.aspera.locapp.cmd;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +34,7 @@ public class FilesCommand implements CommandRunnable {
         long start = System.currentTimeMillis();
         ConfigFacade configFacade = new ConfigFacade();
         IgnoredItemFacade ignoredItemFacade = new IgnoredItemFacade();
+        Set<String> ignoredFileNames =  ignoredItemFacade.listIgnoredFileNames();
 
         String[] excludedPaths = new String[] { "" };
         try {
@@ -56,7 +58,7 @@ public class FilesCommand implements CommandRunnable {
                         file.getAbsolutePath().replace(path, SystemUtils.IS_OS_WINDOWS ? ".\\" : "./"));
                 fileInfo.setSearchPath(path);
 
-                if (ignoredItemFacade.isIgnored(file.getName())) {
+                if (ignoredFileNames.contains(file.getName())) {
                     logger.log(Level.INFO, "Ignoring " + file.getName());
                     continue;
                 }
