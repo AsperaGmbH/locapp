@@ -17,11 +17,11 @@ all available * .properties files from a root directory and imports the path and
         (ci)check-integrity [L]:                Check if all SRC properties provided by XLS properties with all or specified languages(all or by language ISOCODE[L]).
         (cl)ear-loc:                            Delete all(!) entries for Localization!
         (f)iles DIR:                            Read recursive down for properties files and save fileinfo.
-        (iil)import-ignored-list:               Import list of files that are to be excluded from the translation process.
+        (iil)import-ignore-list:                Import list of files that are to be excluded from the translation process.
+        (cil)clear-ignore-list:                 Clear list with ignored files.
         command options mandatory:              Command parameters without brackets are mandatory
         command options optional:               Command parameters inside brackets are optional
         (h)elp:                                 Print this!
-
 
 ### Requirements:
 

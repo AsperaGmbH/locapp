@@ -93,6 +93,8 @@ public class CommandContext {
         addCommand("ci", CheckIntegrityCommand.class);
         addCommand("check-integrity", CheckIntegrityCommand.class);
         addCommand("iil", ImportIgnoredItemsCommand.class);
-        addCommand("import-ignored-list", ImportIgnoredItemsCommand.class);
+        addCommand("import-ignore-list", ImportIgnoredItemsCommand.class);
+        addCommand("cil", ClearIgnoreListCommand.class);
+        addCommand("clear-ignore-list", ClearIgnoreListCommand.class);
     }
 }
