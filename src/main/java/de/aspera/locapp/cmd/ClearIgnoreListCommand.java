@@ -13,7 +13,7 @@ public class ClearIgnoreListCommand implements CommandRunnable {
     public void run() {
         try {
             new IgnoredItemFacade().removeAll();
-            logger.log(Level.INFO, "The ignore list has been cleared.");
+            logger.log(Level.INFO, "All IgnoredItem entries were deleted!");
         } catch (DatabaseException e) {
             logger.severe(e.getMessage());
         }
