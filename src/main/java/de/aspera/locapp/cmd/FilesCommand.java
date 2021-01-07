@@ -58,11 +58,6 @@ public class FilesCommand implements CommandRunnable {
                         file.getAbsolutePath().replace(path, SystemUtils.IS_OS_WINDOWS ? ".\\" : "./"));
                 fileInfo.setSearchPath(path);
 
-                if (ignoredFileNames.contains(file.getName())) {
-                    logger.log(Level.INFO, "Ignoring " + file.getName());
-                    continue;
-                }
-                
                 files.add(fileInfo);
             }
             fileFacade.saveFileInfos(files);

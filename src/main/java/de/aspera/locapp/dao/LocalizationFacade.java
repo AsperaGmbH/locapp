@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.persistence.Query;
 
@@ -31,6 +32,8 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
     private static final String EMPTY_PROPERTIES_HQL = " AND (target.value is null OR target.value = '') ";
     private static final String NOT_EMPTY_PROPERTIES_HQL = " AND target.value != '' ";
+
+    private IgnoredItemFacade ignoredItemFacade = new IgnoredItemFacade();
 
     public LocalizationFacade() {
         super(Localization.class);
@@ -69,8 +72,12 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
     }
 
     public List<String> getLanguages(boolean exportProperties) throws DatabaseException {
+        return getLanguages(exportProperties, false);
+    }
+
+    public List<String> getLanguages(boolean exportProperties, boolean appendSkipped) throws DatabaseException {
         try {
-            String queryStr = "select distinct target.locale from " + Localization.class.getSimpleName() + " target ";
+            String queryStr = "select distinct target.locale, target.fileName from " + Localization.class.getSimpleName() + " target ";
             if (exportProperties) {
             	queryStr += " where target.status = :status AND target.version = :version";
             }
@@ -79,15 +86,29 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
             	query.setParameter("version", lastVersion(Status.XLS));
             	query.setParameter("status", Status.XLS);
             }
+
+            final Set<String> ignoredFileNames = appendSkipped
+                ? new HashSet<String>()
+                : ignoredItemFacade.listIgnoredFileNames();
+
             @SuppressWarnings("unchecked")
-            List<String> languages = (List<String>) query.getResultList();
-            return languages;
+            var languages = (List<Object[]>)query.getResultList();
+
+            return languages.stream()
+                .filter(row -> !ignoredFileNames.contains((String)(row[1])))
+                .map(row -> (String)(row[0]))
+                .collect(Collectors.toList());
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
     }
 
     public List<Localization> getLocalizations(int lastVersion, Status status, boolean emptyProperties, String fullPath)
+            throws DatabaseException {
+        return getLocalizations(lastVersion, status, emptyProperties, fullPath, false);
+    }
+
+    public List<Localization> getLocalizations(int lastVersion, Status status, boolean emptyProperties, String fullPath, boolean includeIgnored)
             throws DatabaseException {
         try {
             StringBuilder queryStr = new StringBuilder();
@@ -108,7 +129,16 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
                 query.setParameter("fullPath", fullPath);
             @SuppressWarnings("unchecked")
             List<Localization> locs = (List<Localization>) query.getResultList();
-            return locs;
+
+            if (includeIgnored) {
+                return locs;
+            }
+
+            Set<String> ignoredFileNames = ignoredItemFacade.listIgnoredFileNames();
+            return locs.stream()
+                .filter(loc -> !ignoredFileNames.contains(loc.getFileName()))
+                .collect(Collectors.toList());
+            
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
