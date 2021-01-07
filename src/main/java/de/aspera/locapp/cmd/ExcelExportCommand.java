@@ -121,8 +121,13 @@ public class ExcelExportCommand implements CommandRunnable {
         } else {
             fileName = HelperUtil.currentTimestamp() + "-export-all.xls";
         }
+        
+        Locale defaultLocale = Locale.ENGLISH;
+        Set<String> fullPaths = locFacade.getFiles(defaultLocale, false);
 
-        Set<String> fullPaths = locFacade.getDefaultFiles(false);
+        if (fullPaths.isEmpty()) {
+            logger.log(Level.SEVERE, "No localization files for the locale [" + defaultLocale.getLanguage() + "].");
+        }
         exportPath += SystemUtils.IS_OS_WINDOWS ? "\\" : "/";
         int rowcount = ROWGAP_HEADER;
 
@@ -149,26 +154,25 @@ public class ExcelExportCommand implements CommandRunnable {
         List<Localization> allLocalizations = locFacade.getLocalizations(lastVersion, Status.SRC, false, null);
 
         for (String fullPath : fullPaths) {
-            for (Localization savedLocalizationEN : locFacade.getLocalizations(lastVersion, Status.SRC, false,
+            for (Localization savedDefLocalization : locFacade.getLocalizations(lastVersion, Status.SRC, false,
                     fullPath)) {
                 int cell = 0;
                 Row row = sheets.get(0).createRow(rowcount++);
-                row.createCell(cell++).setCellValue(savedLocalizationEN.getFileName());
-                row.createCell(cell++).setCellValue(savedLocalizationEN.getKey());
+                row.createCell(cell++).setCellValue(savedDefLocalization.getFileName());
+                row.createCell(cell++).setCellValue(savedDefLocalization.getKey());
                 if (StringUtils.isEmpty(language)) {
                     for (String lang : knownLanguages) {
                         if (lang.equals(Locale.ENGLISH.toString())) {
                             Cell valueCell = row.createCell(cell++);
-                            if (savedLocalizationEN.getValue().equals(EMPTY_VALUE)) {
+                            if (savedDefLocalization.getValue().equals(EMPTY_VALUE)) {
                                 valueCell.setCellStyle(styleMap.get(STYLE_YELLOW));
                             }
-                            // default EN
-                            valueCell.setCellValue(savedLocalizationEN.getValue());
+                            valueCell.setCellValue(savedDefLocalization.getValue());
                         } else {
                             Cell valueCell = row.createCell(cell++);
                             Localization localization = getLoc(allLocalizations,
-                                    HelperUtil.replaceLanguageFromPath(savedLocalizationEN.getFullPath(), lang),
-                                    savedLocalizationEN.getKey(), null);
+                                    HelperUtil.replaceLanguageFromPath(savedDefLocalization.getFullPath(), lang),
+                                    savedDefLocalization.getKey(), null);
                             if (localization.getValue().equals(EMPTY_VALUE)) {
                                 valueCell.setCellStyle(styleMap.get(STYLE_YELLOW));
                             }
@@ -178,13 +182,13 @@ public class ExcelExportCommand implements CommandRunnable {
                 } else {
                     Localization localization = null;
                     Cell valueCell = row.createCell(cell++);
-                    if (!language.equalsIgnoreCase(Locale.ENGLISH.toString())) {
+                    if (!language.equalsIgnoreCase(defaultLocale.toString())) {
                         localization = getLoc(allLocalizations,
-                                HelperUtil.replaceLanguageFromPath(savedLocalizationEN.getFullPath(), language),
-                                savedLocalizationEN.getKey(), language);
+                                HelperUtil.replaceLanguageFromPath(savedDefLocalization.getFullPath(), language),
+                                savedDefLocalization.getKey(), language);
 
-                        Localization enDefaultLoc = getLoc(allLocalizations, savedLocalizationEN.getFullPath(),
-                                savedLocalizationEN.getKey(), Locale.ENGLISH.getLanguage());
+                        Localization defaultLocalization = getLoc(allLocalizations, savedDefLocalization.getFullPath(),
+                                savedDefLocalization.getKey(), defaultLocale.getLanguage());
 
                         if (emptyProperties && !localization.getValue().equals(EMPTY_VALUE)) {
                             sheets.get(0).removeRow(row);
@@ -193,24 +197,24 @@ public class ExcelExportCommand implements CommandRunnable {
                         }
                         if (localization.getValue().equals(EMPTY_VALUE)) {
                             valueCell.setCellStyle(styleMap.get(STYLE_YELLOW));
-                            valueCell.setCellValue("[en]" + enDefaultLoc.getValue());
+                            valueCell.setCellValue("[" + defaultLocale.getLanguage() + "]" + defaultLocalization.getValue());
                         } else {
                             valueCell.setCellValue(localization.getValue());
                         }
 
                     } else {
-                        if (emptyProperties && !savedLocalizationEN.getValue().equals(EMPTY_VALUE)) {
+                        if (emptyProperties && !savedDefLocalization.getValue().equals(EMPTY_VALUE)) {
                             sheets.get(0).removeRow(row);
                             rowcount--;
                             continue;
                         }
-                        if (savedLocalizationEN.getValue().equals(EMPTY_VALUE)) {
+                        if (savedDefLocalization.getValue().equals(EMPTY_VALUE)) {
                             valueCell.setCellStyle(styleMap.get(STYLE_YELLOW));
                         }
-                        valueCell.setCellValue(savedLocalizationEN.getValue());
+                        valueCell.setCellValue(savedDefLocalization.getValue());
                     }
                 }
-                row.createCell(cell++).setCellValue(savedLocalizationEN.getFullPath());
+                row.createCell(cell++).setCellValue(savedDefLocalization.getFullPath());
             }
         }
 

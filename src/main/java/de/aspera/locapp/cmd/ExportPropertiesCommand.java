@@ -55,7 +55,7 @@ public class ExportPropertiesCommand implements CommandRunnable {
 
 		try {
 			allLocalizations = locFacade.getLocalizations(locFacade.lastVersion(Status.XLS), Status.XLS, false, null);
-			Set<String> defaultPathFiles = locFacade.getDefaultFiles(true);
+			Set<String> defaultPathFiles = locFacade.getFiles(Locale.ENGLISH, true);
 			List<String> languages = locFacade.getLanguages(true);
 
 			for (String defaultPathFile : defaultPathFiles) {

@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.persistence.Query;
 
@@ -167,7 +168,7 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
     }
 
-    public Set<String> getDefaultFiles(boolean exportProperties) throws DatabaseException {
+    public Set<String> getFiles(Locale locale, boolean exportProperties) throws DatabaseException {
         try {
             String queryStr = "select distinct target.fullPath from " + Localization.class.getSimpleName()
                     + " target where target.fullPath LIKE :fullPath ";
@@ -182,17 +183,11 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
             }
             	
             @SuppressWarnings("unchecked")
-			List<String> fullPaths = (List<String>) query.getResultList();
-            Set<String> paths = new HashSet<>();
-            for (String path : fullPaths) {
-                if (HelperUtil.getLocaleFromPropertyFile(path).equals(Locale.ENGLISH.toString())) {
-                    paths.add(path);
-                } else {
-                	paths.add(HelperUtil.removeLanguageFromPath(path));
-                }
-            }
+            List<String> fullPaths = (List<String>) query.getResultList();
             
-            return paths;
+            return fullPaths.stream()
+                .filter(path -> HelperUtil.getLocaleFromPropertyFile(path).equals(locale.toString()))
+                .collect(Collectors.toSet());
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
