@@ -23,18 +23,20 @@ public class SetDefaultLanguageCommand implements CommandRunnable {
 
     private void setDefaultLanguage() 
         throws CommandException, DatabaseException {
-        var language = CommandContext.getInstance()
-            .nextArgument()
-            .toLowerCase();
-
-        var locale = new Locale(language);
-
+        String selectedLanguage = CommandContext.getInstance()
+			    .nextArgument();
+		var language = selectedLanguage != null ? selectedLanguage.toLowerCase()
+				: ConfigFacade.DEFAULT_LANGUAGE.toLowerCase();
+		
+		Locale locale;
 		try {
+			locale = new Locale(language);
 			locale.getISO3Language();
 		} catch (MissingResourceException e) {
-			throw new CommandException("Language [" + language + "] is invalid");
+			logger.log(Level.SEVERE, "Language [" + language + "] is invalid. [" + ConfigFacade.DEFAULT_LANGUAGE.toLowerCase() + "] was selected as default language!");
+			locale = new Locale(ConfigFacade.DEFAULT_LANGUAGE.toLowerCase());
 		}
-
         configFacade.setDefaultLanguage(locale);
+        logger.log(Level.INFO, "The configured default language is [" + locale.getLanguage() + "]");
     }
 }

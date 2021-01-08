@@ -20,7 +20,7 @@ public class ConfigFacade extends AbstractFacade<Config> {
 	private static final Logger LOGGER = Logger.getLogger(ConfigFacade.class.getName());
 
 	protected static String DEFAULT_LANGUAGE_KEY = "defaultLanguage";
-	protected static String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
+	public static String DEFAULT_LANGUAGE = Locale.ENGLISH.getLanguage();
 
 	public ConfigFacade() {
 		super(Config.class);
