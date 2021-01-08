@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,10 +27,27 @@ public class HelperUtil {
      * @return
      */
     public static boolean isIgnoredFile(Set<String> ignoredFiles, String filePath) {
-        // TODO: Consider fullPath, fileName and regex
-
         var path = Paths.get(filePath);
-        return ignoredFiles.contains(path.getFileName().toString());
+        var pathAbsolute = path.toAbsolutePath();
+
+        boolean pathComparison = ignoredFiles.stream()
+            .filter(ignoredFile -> !ignoredFile.contains("*"))
+            .map(ignoredFile -> Paths.get(ignoredFile))
+            .anyMatch(ignoredPath -> pathAbsolute.endsWith(ignoredPath.toAbsolutePath()));
+
+        if (pathComparison) {
+            return true;
+        }
+
+        boolean patternComparison = ignoredFiles.stream()
+            .filter(ignoredFile -> ignoredFile.contains("*"))
+            .map(ignoredFile -> ignoredFile.replace("*", "\\w*"))
+            .anyMatch(ignoredFile -> Pattern.compile(ignoredFile)
+                .matcher(path.toString())
+                .find()
+            );
+
+        return patternComparison;
     }
 
     /**
