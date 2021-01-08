@@ -1,8 +1,11 @@
 package de.aspera.locapp.util;
 
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,6 +17,20 @@ public class HelperUtil {
 
     private static SimpleDateFormat FILE_TIMESTAMP_SIMPLE_DATE_FORMAT = new SimpleDateFormat(
             FILE_TIMESTAMP_FORMAT);
+
+    /**
+     * Determine if given filePath is ignored.
+     * 
+     * @param ignoredFiles
+     * @param filePath
+     * @return
+     */
+    public static boolean isIgnoredFile(Set<String> ignoredFiles, String filePath) {
+        // TODO: Consider fullPath, fileName and regex
+
+        var path = Paths.get(filePath);
+        return ignoredFiles.contains(path.getFileName().toString());
+    }
 
     /**
      * Get the Locale ident of a property file.

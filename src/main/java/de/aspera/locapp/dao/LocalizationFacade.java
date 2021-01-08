@@ -77,7 +77,7 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
     public List<String> getLanguages(boolean exportProperties, boolean appendSkipped) throws DatabaseException {
         try {
-            String queryStr = "select distinct target.locale, target.fileName from " + Localization.class.getSimpleName() + " target ";
+            String queryStr = "select distinct target.locale, target.fullPath from " + Localization.class.getSimpleName() + " target ";
             if (exportProperties) {
             	queryStr += " where target.status = :status AND target.version = :version";
             }
@@ -87,15 +87,15 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
             	query.setParameter("status", Status.XLS);
             }
 
-            final Set<String> ignoredFileNames = appendSkipped
+            final Set<String> ignoredFiles = appendSkipped
                 ? new HashSet<String>()
-                : ignoredItemFacade.listIgnoredFileNames();
+                : ignoredItemFacade.listIgnoredFiles();
 
             @SuppressWarnings("unchecked")
             var languages = (List<Object[]>)query.getResultList();
 
             return languages.stream()
-                .filter(row -> !ignoredFileNames.contains((String)(row[1])))
+                .filter(row -> !HelperUtil.isIgnoredFile(ignoredFiles, (String)(row[1])))
                 .map(row -> (String)(row[0]))
                 .collect(Collectors.toList());
         } catch (Exception e) {
@@ -134,11 +134,10 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
                 return locs;
             }
 
-            Set<String> ignoredFileNames = ignoredItemFacade.listIgnoredFileNames();
+            Set<String> ignoredFiles = ignoredItemFacade.listIgnoredFiles();
             return locs.stream()
-                .filter(loc -> !ignoredFileNames.contains(loc.getFileName()))
+                .filter(loc -> !HelperUtil.isIgnoredFile(ignoredFiles, loc.getFullPath()))
                 .collect(Collectors.toList());
-            
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
