@@ -29,6 +29,7 @@ import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
+import de.aspera.locapp.dao.ConfigFacade;
 import de.aspera.locapp.dao.DatabaseException;
 import de.aspera.locapp.dao.LocalizationFacade;
 import de.aspera.locapp.dto.Localization;
@@ -42,6 +43,7 @@ public class ExcelExportCommand implements CommandRunnable {
     private static final int       ROWGAP_HEADER = 0;
     private static final Logger    logger        = Logger.getLogger(ExcelExportCommand.class.getName());
     private LocalizationFacade     locFacade     = new LocalizationFacade();
+    private ConfigFacade           configFacade  = new ConfigFacade();
     private Map<String, CellStyle> styleMap      = new HashMap<>();
     private String                 fileName;
 
@@ -123,6 +125,11 @@ public class ExcelExportCommand implements CommandRunnable {
         }
         
         Locale defaultLocale = Locale.ENGLISH;
+        
+        if (language != null) {
+            defaultLocale = new Locale(configFacade.getDefaultLanguage());
+        }
+
         Set<String> fullPaths = locFacade.getFiles(defaultLocale, false);
 
         if (fullPaths.isEmpty()) {
