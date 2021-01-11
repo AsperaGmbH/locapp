@@ -16,7 +16,12 @@ import javax.persistence.UniqueConstraint;
     uniqueConstraints = @UniqueConstraint(columnNames = {"ID", "FILE_NAME"})
 )
 public class IgnoredItem implements Serializable {
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -4226633978528077781L;
+
+	@Id
     @GeneratedValue
     private String id;
 
@@ -31,7 +36,7 @@ public class IgnoredItem implements Serializable {
         this.id = id;
     }
 
-    @Column(name = "FILE_NAME")
+    @Column(name = "FILE_NAME", unique = true)
     public String getFileName() {
         return fileName;
     }
