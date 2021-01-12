@@ -3,6 +3,7 @@
   <persistence-unit name="h2locapp" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <class>de.aspera.locapp.dto.Localization</class>
+    <class>de.aspera.locapp.dto.IgnoredItem</class>
     <class>de.aspera.locapp.dto.FileInfo</class>
     <class>de.aspera.locapp.dto.Config</class>
     <properties>

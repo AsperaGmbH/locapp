@@ -31,6 +31,7 @@ public class FilesCommand implements CommandRunnable {
 
         long start = System.currentTimeMillis();
         ConfigFacade configFacade = new ConfigFacade();
+        
         String[] excludedPaths = new String[] { "" };
         try {
             excludedPaths = configFacade.getValue("Excluded_Paths");
@@ -52,6 +53,7 @@ public class FilesCommand implements CommandRunnable {
                 fileInfo.setRelativePath(
                         file.getAbsolutePath().replace(path, SystemUtils.IS_OS_WINDOWS ? ".\\" : "./"));
                 fileInfo.setSearchPath(path);
+
                 files.add(fileInfo);
             }
             fileFacade.saveFileInfos(files);

@@ -5,13 +5,16 @@
  */
 package de.aspera.locapp.dao;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.Query;
 
@@ -33,8 +36,21 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
     private static final String EMPTY_PROPERTIES_HQL = " AND (target.value is null OR target.value = '') ";
     private static final String NOT_EMPTY_PROPERTIES_HQL = " AND target.value != '' ";
 
+    private IgnoredItemFacade ignoredItemFacade = new IgnoredItemFacade();
+    private boolean fileIgnoring;
+
     public LocalizationFacade() {
+        this(true);
+    }
+
+    /**
+     * If file ignoring is set, then all of the files (and their entries) that are present on 'blacklist', are ignored.
+     * 
+     * @param fileIgnoring
+     */
+    public LocalizationFacade(boolean fileIgnoring) {
         super(Localization.class);
+        this.fileIgnoring = fileIgnoring;
     }
 
     /**
@@ -71,7 +87,7 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
     public List<String> getLanguages(boolean exportProperties) throws DatabaseException {
         try {
-            String queryStr = "select distinct target.locale from " + Localization.class.getSimpleName() + " target ";
+            String queryStr = "select distinct target.locale, target.fullPath from " + Localization.class.getSimpleName() + " target ";
             if (exportProperties) {
             	queryStr += " where target.status = :status AND target.version = :version";
             }
@@ -80,9 +96,18 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
             	query.setParameter("version", lastVersion(Status.XLS));
             	query.setParameter("status", Status.XLS);
             }
+
             @SuppressWarnings("unchecked")
-            List<String> languages = (List<String>) query.getResultList();
-            return languages;
+            var languages = (List<Object[]>)query.getResultList();
+
+            var procLanguages = fileIgnoring
+                ? filterIgnoredEntries(languages, row -> (String)(row[1]))
+                : languages;
+
+            return procLanguages.stream()
+                .map(row -> (String)(row[0]))
+                .distinct()
+                .collect(Collectors.toList());
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
@@ -109,7 +134,10 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
                 query.setParameter("fullPath", fullPath);
             @SuppressWarnings("unchecked")
             List<Localization> locs = (List<Localization>) query.getResultList();
-            return locs;
+
+            return fileIgnoring
+                ? filterIgnoredEntries(locs, loc -> loc.getFileName())
+                : locs;
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
@@ -145,7 +173,10 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
             @SuppressWarnings("unchecked")
             List<Localization> locs = (List<Localization>) query.getResultList();
-            return locs;
+            
+            return fileIgnoring
+                ? filterIgnoredEntries(locs, loc -> loc.getFileName())
+                : locs;
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
@@ -161,7 +192,10 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
             @SuppressWarnings("unchecked")
             List<Localization> locs = (List<Localization>) query.getResultList();
             getEntityManager().getTransaction().commit();
-            return locs;
+            
+            return fileIgnoring
+                ? filterIgnoredEntries(locs, loc -> loc.getFileName())
+                : locs;
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
@@ -183,15 +217,40 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
             }
             	
             @SuppressWarnings("unchecked")
-            List<String> fullPaths = (List<String>) query.getResultList();
-            
-            return fullPaths.stream()
-                .filter(path -> HelperUtil.getLocaleFromPropertyFile(path).equals(locale.toString()))
-                .collect(Collectors.toSet());
+			List<String> fullPaths = (List<String>) query.getResultList();
+            Set<String> paths = new HashSet<>();
+            for (String path : fullPaths) {
+                if (HelperUtil.getLocaleFromPropertyFile(path).equals(Locale.ENGLISH.toString())) {
+                    paths.add(path);
+                } else {
+                	paths.add(HelperUtil.removeLanguageFromPath(path));
+                }
+            }
+
+            return fileIgnoring
+                ? filterIgnoredEntries(paths, path -> path)
+                : paths;
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
         }
 
+    }
+
+    private <TEntry> Set<TEntry> filterIgnoredEntries(Set<TEntry> entries, Function<TEntry, String> getFullPath) {
+        return streamIgnoredEntries(entries, getFullPath)
+            .collect(Collectors.toSet());
+    }
+
+    private <TEntry> List<TEntry> filterIgnoredEntries(List<TEntry> entries, Function<TEntry, String> getFullPath) {
+        return streamIgnoredEntries(entries, getFullPath)
+            .collect(Collectors.toList());
+    }
+
+    private <TEntry> Stream<TEntry> streamIgnoredEntries(Collection<TEntry> entries, Function<TEntry, String> getFullPath) {
+        Set<String> ignoredFiles = ignoredItemFacade.listIgnoredFiles();
+
+        return entries.stream()
+            .filter(entry -> !HelperUtil.isIgnoredFile(ignoredFiles, getFullPath.apply(entry)));
     }
 
     public void saveLocalizations(List<Localization> locs) throws DatabaseException {

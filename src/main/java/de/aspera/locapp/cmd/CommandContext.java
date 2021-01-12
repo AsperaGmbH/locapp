@@ -23,8 +23,12 @@ public class CommandContext {
     private CommandContext() {
     }
 
-    public void executeCommand(String command) throws CommandException, InstantiationException, IllegalAccessException {
-        ((CommandRunnable) commandMap.get(command).newInstance()).run();
+    public void executeCommand(String command) throws CommandException {
+        try {
+			((CommandRunnable) commandMap.get(command).getDeclaredConstructor().newInstance()).run();
+		} catch (Exception  e) {
+			throw new CommandException(e.getMessage(), e);
+		}
         clearArguments();
     }
 
@@ -92,6 +96,10 @@ public class CommandContext {
         addCommand("merge-properties", MergeCommand.class);
         addCommand("ci", CheckIntegrityCommand.class);
         addCommand("check-integrity", CheckIntegrityCommand.class);
+        addCommand("iil", ImportIgnoredItemsCommand.class);
+        addCommand("import-ignore-list", ImportIgnoredItemsCommand.class);
+        addCommand("cil", ClearIgnoreListCommand.class);
+        addCommand("clear-ignore-list", ClearIgnoreListCommand.class);
         addCommand("sdl", SetDefaultLanguageCommand.class);
         addCommand("set-default-language", SetDefaultLanguageCommand.class);
     }
