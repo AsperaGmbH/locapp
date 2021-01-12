@@ -77,7 +77,7 @@ public class MainStart {
         if (CommandContext.getInstance().isCommand(cmd)) {
             try {
                 CommandContext.getInstance().executeCommand(cmd);
-            } catch (InstantiationException | IllegalAccessException | CommandException e) {
+            } catch (CommandException e) {
                 logger.log(Level.SEVERE, e.getMessage(), e);
             }
         } else {

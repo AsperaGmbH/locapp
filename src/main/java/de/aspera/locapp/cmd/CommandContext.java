@@ -23,8 +23,12 @@ public class CommandContext {
     private CommandContext() {
     }
 
-    public void executeCommand(String command) throws CommandException, InstantiationException, IllegalAccessException {
-        ((CommandRunnable) commandMap.get(command).newInstance()).run();
+    public void executeCommand(String command) throws CommandException {
+        try {
+			((CommandRunnable) commandMap.get(command).getDeclaredConstructor().newInstance()).run();
+		} catch (Exception  e) {
+			throw new CommandException(e.getMessage(), e);
+		}
         clearArguments();
     }
 

@@ -12,7 +12,6 @@ import org.apache.commons.lang3.SystemUtils;
 import de.aspera.locapp.dao.ConfigFacade;
 import de.aspera.locapp.dao.DatabaseException;
 import de.aspera.locapp.dao.FileInfoFacade;
-import de.aspera.locapp.dao.IgnoredItemFacade;
 import de.aspera.locapp.dto.FileInfo;
 
 public class FilesCommand implements CommandRunnable {
