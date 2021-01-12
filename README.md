@@ -12,6 +12,7 @@ all available * .properties files from a root directory and imports the path and
         (ei)excel-import DIR:                   Import properties from an excel file
         (ed)export-delta DIR:                   Export delta (properties vs. excel) into an excel file
         (id)import-delta DIR VERSION:           Import delta and merge with selected version
+        (sdl)select-default-language LANG:      Set default language for excel export (LANG=[en,de...]).
         (pc)properties-count SRC|XLS [L] [E]:   Count the amount of properties (all or by language ISOCODE[L], search for empty values [E=1])
         (mp)merge-properties SRC|XLS:           All known properties will be merged with their latest version to a new data set.
         (ci)check-integrity [L]:                Check if all SRC properties provided by XLS properties with all or specified languages(all or by language ISOCODE[L]).

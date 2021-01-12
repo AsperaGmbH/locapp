@@ -12,6 +12,7 @@ public class HelpCommand implements CommandRunnable {
         System.out.println("\t(ei)excel-import DIR: \t\t\tImport properties from an excel file");
         System.out.println("\t(ed)export-delta DIR: \t\t\tExport delta (properties vs. excel) into an excel file");
         System.out.println("\t(id)import-delta DIR VERSION: \t\tImport delta and merge with selected version");
+        System.out.println("\t(sdl)select-default-language LANG: \tSet default language for excel export (LANG=[en,de...]).");
         System.out.println("\t(pc)properties-count SRC|XLS [L] [E]: \tCount the amount of properties (all or by language ISOCODE[L], search for empty values [E=1])");
         System.out.println("\t(mp)merge-properties SRC|XLS: \t\tAll known properties will be merged with their latest version to a new data set.");
         System.out.println("\t(ci)check-integrity [L]: \t\tCheck if all SRC properties provided by XLS properties with all or specified languages(all or by language ISOCODE[L]).");

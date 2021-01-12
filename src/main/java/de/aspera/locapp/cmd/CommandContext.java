@@ -92,5 +92,7 @@ public class CommandContext {
         addCommand("merge-properties", MergeCommand.class);
         addCommand("ci", CheckIntegrityCommand.class);
         addCommand("check-integrity", CheckIntegrityCommand.class);
+        addCommand("sdl", SetDefaultLanguageCommand.class);
+        addCommand("set-default-language", SetDefaultLanguageCommand.class);
     }
 }
