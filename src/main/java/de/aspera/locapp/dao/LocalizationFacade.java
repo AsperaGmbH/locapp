@@ -106,6 +106,7 @@ public class LocalizationFacade extends AbstractFacade<Localization> {
 
             return procLanguages.stream()
                 .map(row -> (String)(row[0]))
+                .distinct()
                 .collect(Collectors.toList());
         } catch (Exception e) {
             throw new DatabaseException(e.getMessage(), e);
