@@ -125,12 +125,11 @@ public class ExcelExportCommand implements CommandRunnable {
         }
         
         Locale defaultLocale = Locale.ENGLISH;
-        
+        Set<String> fullPaths = locFacade.getFiles(defaultLocale, false);
+
         if (language != null) {
             defaultLocale = new Locale(configFacade.getDefaultLanguage());
         }
-
-        Set<String> fullPaths = locFacade.getFiles(defaultLocale, false);
 
         if (fullPaths.isEmpty()) {
             logger.log(Level.SEVERE, "No localization files for the locale [" + defaultLocale.getLanguage() + "].");
@@ -161,6 +160,10 @@ public class ExcelExportCommand implements CommandRunnable {
         List<Localization> allLocalizations = locFacade.getLocalizations(lastVersion, Status.SRC, false, null);
 
         for (String fullPath : fullPaths) {
+            String defaultLocFullPath = defaultLocale.equals(Locale.ENGLISH)
+                ? fullPath
+                : HelperUtil.replaceLanguageFromPath(fullPath, defaultLocale.getLanguage());
+
             for (Localization savedDefLocalization : locFacade.getLocalizations(lastVersion, Status.SRC, false,
                     fullPath)) {
                 int cell = 0;
@@ -187,15 +190,21 @@ public class ExcelExportCommand implements CommandRunnable {
                         }
                     }
                 } else {
-                    Localization localization = null;
                     Cell valueCell = row.createCell(cell++);
                     if (!language.equalsIgnoreCase(defaultLocale.toString())) {
-                        localization = getLoc(allLocalizations,
-                                HelperUtil.replaceLanguageFromPath(savedDefLocalization.getFullPath(), language),
-                                savedDefLocalization.getKey(), language);
+                        Localization localization = getLoc(
+                            allLocalizations,
+                            HelperUtil.replaceLanguageFromPath(fullPath, language),
+                            savedDefLocalization.getKey(), 
+                            language
+                        );
 
-                        Localization defaultLocalization = getLoc(allLocalizations, savedDefLocalization.getFullPath(),
-                                savedDefLocalization.getKey(), defaultLocale.getLanguage());
+                        Localization defaultLocalization = getLoc(
+                            allLocalizations, 
+                            defaultLocFullPath,
+                            savedDefLocalization.getKey(), 
+                            defaultLocale.getLanguage()
+                        );
 
                         if (emptyProperties && !localization.getValue().equals(EMPTY_VALUE)) {
                             sheets.get(0).removeRow(row);
@@ -221,7 +230,7 @@ public class ExcelExportCommand implements CommandRunnable {
                         valueCell.setCellValue(savedDefLocalization.getValue());
                     }
                 }
-                row.createCell(cell++).setCellValue(savedDefLocalization.getFullPath());
+                row.createCell(cell++).setCellValue(fullPath);
             }
         }
 
