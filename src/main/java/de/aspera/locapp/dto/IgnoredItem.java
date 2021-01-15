@@ -11,10 +11,7 @@ import javax.persistence.UniqueConstraint;
 
 
 @Entity
-@Table(
-    name = "IGNORED_ITEM",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"ID", "FILE_NAME"})
-)
+@Table(name = "IGNORED_ITEM", uniqueConstraints = @UniqueConstraint(columnNames = { "fileName"}))
 public class IgnoredItem implements Serializable {
     /**
 	 * 
@@ -36,7 +33,7 @@ public class IgnoredItem implements Serializable {
         this.id = id;
     }
 
-    @Column(name = "FILE_NAME", unique = true)
+    @Column(name = "FILENAME")
     public String getFileName() {
         return fileName;
     }
