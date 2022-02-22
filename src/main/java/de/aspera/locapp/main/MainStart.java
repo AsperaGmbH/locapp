@@ -34,10 +34,11 @@ public class MainStart {
     private static Server H2Server;
     private static final Logger logger = Logger.getLogger(MainStart.class.getName());
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws ParseException, SQLException {
         init();
         // After start -> hold the command cli in recursiv mode.
         promptCLI();
+        loadDatabase();
     }
 
     private static void init() {
